@@ -2,7 +2,7 @@
  * Day 1
  * A stop watch
  */
-import React, { useState, useEffect, memo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { Platform, FlatList, StyleSheet, StatusBar, Text, TouchableHighlight, View } from 'react-native';
 import Util from './utils';
 import { produce } from 'immer';
@@ -53,14 +53,19 @@ const WatchRow = memo(({ title, time }) =>
 		</View>
 	</View>);
 
-const WatchRecord = ({ record }) => (
-	<FlatList
-		style={styles.recordList}
-		data={[...record]}
-		extraData={record}
-		renderItem={({ index, item: { title, time } }) => <WatchRow key={index} title={title} time={time} />}
-	/>
-);
+const WatchRecord = ({ record }) => {
+	const renderItem = useCallback(({ index, item: { title, time } }) => <WatchRow key={index} title={title} time={time} />);
+
+	return (
+		<FlatList
+			getItemLayout={(data, index) => ({ length: 40, offset: 40 * index, index })}
+			style={styles.recordList}
+			data={[...record]}
+			extraData={record}
+			renderItem={renderItem}
+		/>
+	)
+};
 
 export default () => {
 	const [state, setState] = useState({
@@ -89,8 +94,7 @@ export default () => {
 	}, [])
 
 	const { ticking } = state;
-	const intervalRe
-	f = useRef();
+	const intervalRef = useRef();
 
 	useEffect(() => {
 		if (ticking) {
