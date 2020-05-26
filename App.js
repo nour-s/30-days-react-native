@@ -43,7 +43,6 @@ const WatchControl = ({ stopWatch, clearRecord, startWatch, addRecord }) => {
 			</View>
 		</View>
 	)
-
 }
 
 const WatchRow = memo(({ title, time }) =>
@@ -90,10 +89,12 @@ export default () => {
 	}, [])
 
 	const { ticking } = state;
-	const intRef = useRef();
+	const intervalRe
+	f = useRef();
+
 	useEffect(() => {
 		if (ticking) {
-			const inter = setInterval(
+			const interval = setInterval(
 				() => {
 					setState(prevState => {
 						let milSecond, second, minute, countingTime, secmilSecond, secsecond, secminute, seccountingTime;
@@ -114,9 +115,9 @@ export default () => {
 					})
 				}, 10);
 
-			intRef.current = inter;
+			intervalRef.current = interval;
 		} else {
-			clearInterval(intRef.current)
+			clearInterval(intervalRef.current)
 			setState(prevState => {
 				return {
 					...prevState,
@@ -124,7 +125,7 @@ export default () => {
 				};
 			});
 		}
-		return () => clearInterval(intRef.current);
+		return () => clearInterval(intervalRef.current);
 	}, [ticking])
 
 	const _startWatch = () => {
@@ -184,13 +185,11 @@ export default () => {
 		}));
 	}
 
-
 	return (<View style={styles.watchContainer}>
 		<WatchFace totalTime={state.totalTime} sectionTime={state.sectionTime}></WatchFace>
 		<WatchControl addRecord={() => _addRecord()} clearRecord={() => _clearRecord()} startWatch={() => _startWatch()} stopWatch={() => _stopWatch()} />
 		<WatchRecord record={state.record}></WatchRecord>
 	</View>);
-
 }
 
 const styles = StyleSheet.create({
